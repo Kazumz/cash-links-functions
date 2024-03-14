@@ -15,6 +15,7 @@ Execute in Git Bash
 
 Use VSCode Azure Function Tools to deploy directly to the Azure Function Resource.
 
+### Considerations
 Deployment to Azure for running Golang using Azure Functions is not ideal. The deployment process currently requires manual effort as 'Deployment Center' is not available.
 
 https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-other?tabs=go%2Cwindows#compile-the-custom-handler-for-azure
