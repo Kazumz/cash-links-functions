@@ -1,6 +1,8 @@
 # cash-links-functions
 A Web API that returns cash-rewarding referral links.
 
+https://cash-links-functions.azurewebsites.net/api/HttpExample
+
 ## Run
 Execute in Git Bash
 ./run-windows.bat
