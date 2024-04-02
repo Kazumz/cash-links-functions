@@ -2,20 +2,51 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	message := "This HTTP triggered function executed successfully. Pass a name in the query string for a personalized response.\n"
-	name := r.URL.Query().Get("name")
+func getAllHandler(w http.ResponseWriter, r *http.Request) {
+	// Create a new HTTP client
+	client := &http.Client{}
 
-	if name != "" {
-		message = fmt.Sprintf("Hello, %s. This HTTP triggered function executed successfully.\n", name)
+	// Create a new GET request
+	// NOTE: In order for this to work in the cloud (AWS or Azure), you need to authenticate with OAuth and use a bearer token.
+	req, err := http.NewRequest("GET", "https://oauth.reddit.com/r/beermoneyuk/hot.json?limit=25", nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return
 	}
 
-	fmt.Fprint(w, message)
+	// Send the request
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending request:", err)
+		return
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Error sending request:", err)
+			return
+		}
+	}(resp.Body)
+
+	// Read the response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+		return
+	}
+
+	// Set Writer to expect JSON, therefore consumers.
+	w.Header().Set("Content-Type", "application/json")
+
+	fmt.Fprint(w, string(body))
 }
 
 func main() {
@@ -24,7 +55,7 @@ func main() {
 		listenAddr = ":" + val
 	}
 
-	http.HandleFunc("/api/HttpExample", helloHandler)
+	http.HandleFunc("/api/HttpExample", getAllHandler)
 
 	log.Printf("About to listen on %s. Go to https://127.0.0.1%s/", listenAddr, listenAddr)
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
